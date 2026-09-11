@@ -47,7 +47,7 @@ chmod +x ./start.sh
 ```
 
 This loads `.env_3d186026-a490-405e-9a9b-e15f8ab6d64b`, builds the jar with the Maven
-Wrapper, and starts the app on port `21552` (override with `SERVER_PORT=xxxx
+Wrapper, and starts the app on port `25084` (override with `SERVER_PORT=xxxx
 ./start.sh`).
 
 On Windows, use `start.bat`.
@@ -65,8 +65,8 @@ multi-stage `Dockerfile`), wired together via the compose network. The app reads
 
 ## API Documentation
 
-- Swagger UI: `http://localhost:21552/docs`
-- OpenAPI JSON: `http://localhost:21552/api-docs`
+- Swagger UI: `http://localhost:25084/docs`
+- OpenAPI JSON: `http://localhost:25084/api-docs`
 
 Every endpoint is documented there with request/response schemas. To try an endpoint
 that requires authentication, first call `POST /api/v1/auth/login`, copy the `token`
@@ -127,7 +127,7 @@ notifications sent to both the borrower and the owner.
 Register:
 
 ```bash
-curl -X POST http://localhost:21552/api/v1/auth/register \
+curl -X POST http://localhost:25084/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"name":"Jane Doe","email":"jane@example.com","password":"Secret123","neighborhood":"Maple Heights","phone":"555-1111"}'
 ```
@@ -135,7 +135,7 @@ curl -X POST http://localhost:21552/api/v1/auth/register \
 Login:
 
 ```bash
-curl -X POST http://localhost:21552/api/v1/auth/login \
+curl -X POST http://localhost:25084/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"jane@example.com","password":"Secret123"}'
 ```
@@ -143,7 +143,7 @@ curl -X POST http://localhost:21552/api/v1/auth/login \
 Create a tool (replace `$TOKEN`):
 
 ```bash
-curl -X POST http://localhost:21552/api/v1/tools \
+curl -X POST http://localhost:25084/api/v1/tools \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name":"Circular Saw","category":"Power Tools","description":"7 1/4 inch","condition":"GOOD","available":true}'

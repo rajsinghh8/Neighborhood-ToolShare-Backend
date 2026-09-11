@@ -3,7 +3,7 @@ services:
     image: postgres:17.2
     restart: unless-stopped
     environment:
-      POSTGRES_DB: gen_601cfe67f33b
+      POSTGRES_DB: gen_9bb072199192
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
     ports:
@@ -11,7 +11,7 @@ services:
     volumes:
       - toolshare_db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U myuser -d gen_601cfe67f33b"]
+      test: ["CMD-SHELL", "pg_isready -U myuser -d gen_9bb072199192"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -24,10 +24,10 @@ services:
     env_file:
       - .env_3d186026-a490-405e-9a9b-e15f8ab6d64b
     environment:
-      SERVER_PORT: "21552"
-      DB_URL: jdbc:postgresql://db:5432/gen_601cfe67f33b
+      SERVER_PORT: "25084"
+      DB_URL: jdbc:postgresql://db:5432/gen_9bb072199192
     ports:
-      - "21552:21552"
+      - "25084:25084"
     depends_on:
       db:
         condition: service_healthy

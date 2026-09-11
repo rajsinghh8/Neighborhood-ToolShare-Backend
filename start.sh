@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-SERVER_PORT="${SERVER_PORT:-21552}"
+SERVER_PORT="${SERVER_PORT:-25084}"
 
 set -a
 [ -f .env_3d186026-a490-405e-9a9b-e15f8ab6d64b ] && . ./.env_3d186026-a490-405e-9a9b-e15f8ab6d64b
