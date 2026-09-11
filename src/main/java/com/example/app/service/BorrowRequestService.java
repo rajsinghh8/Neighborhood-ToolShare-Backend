@@ -225,17 +225,34 @@ public class BorrowRequestService {
     }
   }
 
+  /**
+   * Contact details are only shared between the owner and borrower once the request has moved
+   * past PENDING (i.e. it has been approved), so both sides can coordinate pickup/return.
+   */
+  private static final java.util.Set<BorrowStatus> CONTACT_VISIBLE_STATUSES =
+      java.util.Set.of(
+          BorrowStatus.APPROVED, BorrowStatus.ACTIVE, BorrowStatus.OVERDUE, BorrowStatus.RETURNED);
+
   public BorrowRequestResponse toResponse(BorrowRequest borrowRequest) {
+    User owner = borrowRequest.getTool().getOwner();
+    User borrower = borrowRequest.getBorrower();
+    boolean shareContact = CONTACT_VISIBLE_STATUSES.contains(borrowRequest.getStatus());
+
     return new BorrowRequestResponse(
         borrowRequest.getId(),
         borrowRequest.getTool().getId(),
         borrowRequest.getTool().getName(),
-        borrowRequest.getTool().getOwner().getId(),
-        borrowRequest.getBorrower().getId(),
-        borrowRequest.getBorrower().getName(),
+        owner.getId(),
+        owner.getName(),
+        borrower.getId(),
+        borrower.getName(),
         borrowRequest.getRequestedStartDate(),
         borrowRequest.getRequestedEndDate(),
         borrowRequest.getStatus(),
-        borrowRequest.getCreatedAt());
+        borrowRequest.getCreatedAt(),
+        shareContact ? owner.getEmail() : null,
+        shareContact ? owner.getPhone() : null,
+        shareContact ? borrower.getEmail() : null,
+        shareContact ? borrower.getPhone() : null);
   }
 }
