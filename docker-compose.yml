@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:17.2
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: gen_601cfe67f33b
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - toolshare_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d gen_601cfe67f33b"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env_3d186026-a490-405e-9a9b-e15f8ab6d64b
+    environment:
+      SERVER_PORT: "21552"
+      DB_URL: jdbc:postgresql://db:5432/gen_601cfe67f33b
+    ports:
+      - "21552:21552"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  toolshare_db_data:
