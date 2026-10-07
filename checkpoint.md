@@ -6,10 +6,11 @@ Mode: /aisdlc/modes/greenfield/03-tornado.md. No linting. pytest + pytest-asynci
 ## Status
 | Step | State |
 |---|---|
-| Core infra (config, core/, db/, models/, events/, container, routes, main, seed, handlers/base, openapi/common+__init__, schemas/common, repositories/base+core_repos+stats, services/event_access+audit_recorder+notification_recorder, tests/conftest.py) | DONE |
-| Group builders A..G (see below) | TODO |
-| Dockerfile, docker-compose.yml, .env.example, README, start.sh | TODO |
-| Boot verify, tests, fix loop, reports (xlsx+docx in tests-artifacts/), Docker verify | TODO |
+| Core infra, groups A..G (all handlers/services/repos/openapi/tests) | DONE |
+| Dockerfile, docker-compose.yml, .env.example, README, start.sh | DONE (files exist) |
+| Boot verify (native, SQLite) + pytest 342 passed + live API runner 76/76 PASS | DONE |
+| Reports tests-artifacts/api_test_report.xlsx + project_report.docx | DONE |
+| Docker image pull/build verification | SKIPPED: docker daemon not running on host (docker.sock missing) |
 
 ## Shared infrastructure (already written — READ, don't rewrite)
 - `app/handlers/base.py` BaseHandler: `self.current_user_id`, `self.service(Cls)`, `self.parse_body(Schema)`, `self.page_request(sort_fields, default_sort, default_dir)`, `self.query_enum(name, EnumCls)`, `self.query_date_range()` (startDate/endDate), `self.send_json(data, status)`, `self.send_page(page, ItemSchema)`, `self.send_no_content()`. Errors: raise `app.core.errors.*` (NotFoundError 404, BadRequestError 400, ConflictError 409, ValidationFailedError/BusinessRuleError 422); pydantic ValidationError -> 422 centrally; envelope `{timestamp,status,error,message,path}`. Set `public = True` on a handler class to skip JWT.
@@ -46,3 +47,9 @@ Mode: /aisdlc/modes/greenfield/03-tornado.md. No linting. pytest + pytest-asynci
 ## Groups (service-builder units)
 A auth+events | B tasks | C guests | D budget-categories+expenses | E schedule-items | F vendors+vendor-payments | G notifications+audit-logs+scheduler
 Each owns: repositories/<x>_repository.py, schemas/<x>.py, services/<x>_service.py, handlers/<x>_handlers.py, openapi/paths_<x>.py, tests/test_<x>.py.
+
+## Verifier-gap fixes (resume)
+- docker-compose.yml: all kafka env values + DATABASE_URL + KAFKA_BOOTSTRAP_SERVERS now quoted. DONE
+- Docker daemon still unavailable (docker_pull failed: cannot connect to docker.sock). **Dockerfile verification skipped: docker unavailable** (images mysql:8.4.3, apache/kafka:4.3.1, python:3.13.5-slim never pulled; Dockerfile never built/run).
+- MySQL boot check: host has MariaDB 11.8.6 (MySQL-protocol, NOT MySQL 8.4). App booted with mysql+aiomysql, create_all DDL OK (11 tables, FKs CASCADE/SET NULL, InnoDB utf8mb4), live runner 76/76 PASS (tests-artifacts/mysql_live_results.json). Found+fixed real bug: unpinned transitive PyMySQL 1.2.3 broke pool_pre_ping (`ping() missing reconnect`) -> pinned PyMySQL==1.1.1 in requirements.txt. Not verified on genuine MySQL 8.4.
+- tests-artifacts/test_results.json now copied into the project (SQLite run).
