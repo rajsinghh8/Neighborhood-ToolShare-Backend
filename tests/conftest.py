@@ -41,7 +41,7 @@ class ApiClient:
             hdrs["Authorization"] = f"Bearer {use_token}"
         hdrs.update(headers or {})
         data = body if isinstance(body, (str, bytes)) else (json.dumps(body) if body is not None else None)
-        req = HTTPRequest(self.base_url + path, method=method, headers=hdrs, body=data, raise_error=False)
+        req = HTTPRequest(self.base_url + path, method=method, headers=hdrs, body=data)
         res = await self._http.fetch(req, raise_error=False)
         parsed: Any = None
         if res.body:

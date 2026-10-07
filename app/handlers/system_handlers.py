@@ -19,7 +19,7 @@ SWAGGER_HTML = """<!DOCTYPE html>
 <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
 <script>
   window.onload = function () {
-    window.ui = SwaggerUIBundle({url: "/api/v1/openapi.json", dom_id: "#swagger-ui"});
+    window.ui = SwaggerUIBundle({url: "/openapi.json", dom_id: "#swagger-ui"});
   };
 </script>
 </body>
@@ -58,6 +58,8 @@ class DocsHandler(BaseHandler):
 
 ROUTES = [
     ("/health", HealthHandler),
+    ("/openapi.json", OpenApiHandler),
+    ("/docs", DocsHandler),
     (API_PREFIX + "/openapi.json", OpenApiHandler),
     (API_PREFIX + "/docs", DocsHandler),
 ]

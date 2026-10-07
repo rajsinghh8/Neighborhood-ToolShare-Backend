@@ -66,6 +66,9 @@ class KafkaEventConsumer:
         except (ValueError, UnicodeDecodeError):
             logger.warning("Discarding malformed message on topic=%s", topic)
             return
+        if not isinstance(body, dict):
+            logger.warning("Discarding non-object message on topic=%s", topic)
+            return
         self._handler(topic, body)
 
     async def stop(self) -> None:

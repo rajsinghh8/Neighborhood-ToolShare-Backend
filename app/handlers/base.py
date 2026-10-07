@@ -1,7 +1,6 @@
 """BaseHandler: auth, correlation id, body parsing, pagination parsing, error envelope."""
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
 import uuid
@@ -24,8 +23,6 @@ logger = logging.getLogger(__name__)
 
 SchemaT = TypeVar("SchemaT", bound=ApiModel)
 ServiceT = TypeVar("ServiceT")
-
-_background_tasks: set[asyncio.Task] = set()
 
 
 class BaseHandler(web.RequestHandler):
@@ -51,13 +48,20 @@ class BaseHandler(web.RequestHandler):
         if not self.public:
             self._user_id = self._authenticate()
 
-    def on_finish(self) -> None:
-        """Close this request's DB session (opened lazily by ``uow``)."""
+    async def _execute(self, transforms, *args, **kwargs):  # noqa: D401 - tornado hook
+        """Run the request, then always release this request's DB session."""
+        try:
+            await super()._execute(transforms, *args, **kwargs)
+        finally:
+            await self._release_uow()
+
+    async def _release_uow(self) -> None:
         if self._uow is not None:
-            task = asyncio.get_event_loop().create_task(self._uow.close())
-            _background_tasks.add(task)
-            task.add_done_callback(_background_tasks.discard)
-            self._uow = None
+            uow, self._uow = self._uow, None
+            try:
+                await uow.close()
+            except Exception:  # noqa: BLE001 - boundary: closing must never fail the request
+                logger.warning("Failed to close DB session", exc_info=True)
 
     def set_default_headers(self) -> None:
         self.set_header("Content-Type", "application/json; charset=UTF-8")
