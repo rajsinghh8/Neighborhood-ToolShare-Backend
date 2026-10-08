@@ -26,6 +26,7 @@ Default admin (seeded on first start): `admin` / `admin123`. Override via `.env`
 | POST | `/auth/refresh` | public | rotates the refresh token |
 | POST | `/auth/register` | ADMIN | creates a user (ADMIN/TEACHER) |
 | GET | `/students?grade=&offset=0&limit=20` | ADMIN, TEACHER | `limit` 1-100, response `{items, offset, limit, total}` |
+| GET | `/students/count` | ADMIN, TEACHER | response `{count}` |
 | GET | `/students/{id}` | ADMIN, TEACHER | |
 | POST | `/students` | ADMIN | 201 + `Location` |
 | PUT | `/students/{id}` | ADMIN | full replace |
@@ -45,3 +46,5 @@ Events are written to an `OUTBOX_EVENT` table in the same transaction as the cha
 ## Tests
 
 `tests-artifacts/api_test_report.xlsx` and `project_report.docx` come from a live run (HTTP + real Kafka + Oracle).
+
+Re-run: `python tests/run_api_tests.py` (stack up) then `python tests/generate_reports.py`.

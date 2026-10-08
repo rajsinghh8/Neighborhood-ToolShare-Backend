@@ -2,6 +2,7 @@ package com.school.sms.controller;
 
 import com.school.sms.dto.Dtos;
 import com.school.sms.dto.Dtos.PageResponse;
+import com.school.sms.dto.Dtos.StudentCountResponse;
 import com.school.sms.dto.Dtos.StudentRequest;
 import com.school.sms.dto.Dtos.StudentResponse;
 import com.school.sms.service.StudentService;
@@ -55,6 +56,13 @@ public class StudentController {
             @RequestParam(defaultValue = DEFAULT_OFFSET) @Min(0) int offset,
             @RequestParam(defaultValue = DEFAULT_LIMIT) @Min(1) @Max(MAX_LIMIT) int limit) {
         return studentService.list(grade, offset, limit);
+    }
+
+    @GetMapping("/count")
+    @PreAuthorize(READ_ROLES)
+    @Operation(summary = "Get total number of students")
+    public StudentCountResponse count() {
+        return studentService.getStudentCount();
     }
 
     @GetMapping("/{id}")

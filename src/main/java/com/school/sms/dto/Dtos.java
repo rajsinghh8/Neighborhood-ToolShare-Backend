@@ -63,6 +63,9 @@ public final class Dtos {
             boolean active) {
     }
 
+    public record StudentCountResponse(long count) {
+    }
+
     public record PageResponse<T>(List<T> items, int offset, int limit, long total) {
     }
 }

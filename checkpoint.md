@@ -35,3 +35,8 @@ Host: Docker daemon was not running; started with `setsid dockerd`. No mvn on ho
 - [x] Dockerfile built+run verified (container port 8000, /health 200, /docs 200); infra torn down
 - Note: this host's kernel.shmmax=2^64-1 breaks Oracle startup (EOVERFLOW even for `cat`; docker `sysctls` and bind-mounts over /proc are refused by runc).
 - [x] Deploy-contract fix: compose `oracle` now builds docker/oracle/Dockerfile (gvenzl image + static busybox + entrypoint that, only if /proc/sys/kernel/shmmax is unreadable, bind-mounts sane values as root with cap SYS_ADMIN, then `su oracle`). Healthcheck runs healthcheck.sh via busybox su. Verified: `docker compose up -d --build --wait` exit 0, oracle/kafka/app all healthy, /health 200, admin login at /api/v1/auth/login returns token.
+
+## Change: GET /api/v1/students/count (done)
+- Added Dtos.StudentCountResponse(long count), StudentService.getStudentCount() (readOnly tx, debug log; uses inherited repo.count()), StudentController GET /count (READ_ROLES). No repo/schema/config change.
+- Original test scripts were lost; rewritten as tests/run_api_tests.py (all 47 prior checks re-executed + 5 new count rows 48-52) and tests/generate_reports.py (use /usr/local/bin/python — has openpyxl/python-docx). Result: 52/52 PASS in tests-artifacts/.
+- Compose project network is `sms-school_default` (not `sms-school`). Dockerfile run verify: /health 200 on 8001, infra torn down.

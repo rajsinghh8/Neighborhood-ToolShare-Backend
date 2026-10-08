@@ -1,6 +1,7 @@
 package com.school.sms.service;
 
 import com.school.sms.dto.Dtos.PageResponse;
+import com.school.sms.dto.Dtos.StudentCountResponse;
 import com.school.sms.dto.Dtos.StudentRequest;
 import com.school.sms.dto.Dtos.StudentResponse;
 import com.school.sms.exception.NotFoundException;
@@ -46,6 +47,13 @@ public class StudentService {
                 offset,
                 limit,
                 page.getTotalElements());
+    }
+
+    @Transactional(readOnly = true)
+    public StudentCountResponse getStudentCount() {
+        long count = studentRepository.count();
+        log.debug("Student count requested: total={}", count);
+        return new StudentCountResponse(count);
     }
 
     @Transactional(readOnly = true)
