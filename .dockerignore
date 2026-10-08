@@ -1,0 +1,6 @@
+target/
+.git/
+logs/
+tests-artifacts/
+checkpoint.md
+.env
