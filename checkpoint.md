@@ -33,4 +33,5 @@ Host: Docker daemon was not running; started with `setsid dockerd`. No mvn on ho
 - [x] Boot verification (jar on compose network, Oracle + Kafka real): 47/47 checks PASS (HTTP + KAFKA delivery, consumer log, duplicate delivery, DLQ, broker-down 2xx<1s + outbox + recovery)
 - [x] Reports: tests-artifacts/{api_test_report.xlsx,project_report.docx,test_results.json}
 - [x] Dockerfile built+run verified (container port 8000, /health 200, /docs 200); infra torn down
-- Note: this host's kernel.shmmax=2^64-1 breaks Oracle startup; verification DB used a host-side bind-mount override (not part of deliverable compose).
+- Note: this host's kernel.shmmax=2^64-1 breaks Oracle startup (EOVERFLOW even for `cat`; docker `sysctls` and bind-mounts over /proc are refused by runc).
+- [x] Deploy-contract fix: compose `oracle` now builds docker/oracle/Dockerfile (gvenzl image + static busybox + entrypoint that, only if /proc/sys/kernel/shmmax is unreadable, bind-mounts sane values as root with cap SYS_ADMIN, then `su oracle`). Healthcheck runs healthcheck.sh via busybox su. Verified: `docker compose up -d --build --wait` exit 0, oracle/kafka/app all healthy, /health 200, admin login at /api/v1/auth/login returns token.

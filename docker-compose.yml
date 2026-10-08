@@ -2,17 +2,26 @@ name: sms-school
 
 services:
   oracle:
-    image: gvenzl/oracle-free:23-slim
+    # gvenzl/oracle-free:23-slim wrapped with a startup guard (see docker/oracle/Dockerfile)
+    # for hosts whose kernel.shmmax/shmall read as 2^64-1 (ORA-00600 [ksmcsg] /
+    # ORA-27300 status 75). It is a no-op on normal hosts; SYS_ADMIN is only used by
+    # the root-phase of the entrypoint to bind-mount sane values, then it drops to oracle.
+    build:
+      context: ./docker/oracle
+    image: sms-school-oracle-free:23-slim
+    cap_add:
+      - SYS_ADMIN
     environment:
       - ORACLE_PASSWORD=${ORACLE_PASSWORD:-oraclepass}
       - APP_USER=${DB_USERNAME:-sms}
       - APP_USER_PASSWORD=${DB_PASSWORD:-smspass}
+    shm_size: "2gb"
     ports:
       - "1521:1521"
     volumes:
       - oracle-data:/opt/oracle/oradata
     healthcheck:
-      test: ["CMD", "healthcheck.sh"]
+      test: ["CMD-SHELL", "/usr/local/bin/busybox su -s /bin/bash oracle -c healthcheck.sh"]
       interval: 10s
       timeout: 5s
       retries: 30

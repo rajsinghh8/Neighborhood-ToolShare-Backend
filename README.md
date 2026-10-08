@@ -10,6 +10,10 @@ docker compose up -d --build        # oracle + kafka + app
 # Health:      http://localhost:8000/health
 ```
 
+The `oracle` service is built from `docker/oracle/Dockerfile` (gvenzl/oracle-free:23-slim plus a startup guard).
+On hosts where `kernel.shmmax`/`shmall` read as 2^64-1, Oracle otherwise dies with ORA-00600 [ksmcsg] / ORA-27300;
+the guard bind-mounts sane values only in that case (needs `cap_add: SYS_ADMIN`, dropped before Oracle starts) and is a no-op elsewhere.
+
 Local development: start only infra (`docker compose up -d oracle kafka`), then `mvn spring-boot:run` (defaults point at `localhost:1521` and `localhost:29092`).
 
 Default admin (seeded on first start): `admin` / `admin123`. Override via `.env` (see `.env.example`), and always set a real `JWT_SECRET` (>= 32 chars).
