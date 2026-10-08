@@ -39,4 +39,5 @@ Host: Docker daemon was not running; started with `setsid dockerd`. No mvn on ho
 ## Change: GET /api/v1/students/count (done)
 - Added Dtos.StudentCountResponse(long count), StudentService.getStudentCount() (readOnly tx, debug log; uses inherited repo.count()), StudentController GET /count (READ_ROLES). No repo/schema/config change.
 - Original test scripts were lost; rewritten as tests/run_api_tests.py (all 47 prior checks re-executed + 5 new count rows 48-52) and tests/generate_reports.py (use /usr/local/bin/python — has openpyxl/python-docx). Result: 52/52 PASS in tests-artifacts/.
+- Re-verification (final): compose up --build --wait (oracle, kafka, app healthy; app container port 8000), tests re-run 52/52 PASS (rows 48-52 count), reports regenerated, /health 200, /docs 302->Swagger 200 (public). Infra torn down.
 - Compose project network is `sms-school_default` (not `sms-school`). Dockerfile run verify: /health 200 on 8001, infra torn down.
