@@ -1,0 +1,82 @@
+server:
+  port: ${SERVER_PORT:8080}
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: sms
+  datasource:
+    url: ${DB_URL:jdbc:oracle:thin:@//localhost:1521/FREEPDB1}
+    username: ${DB_USERNAME:sms}
+    password: ${DB_PASSWORD:smspass}
+    driver-class-name: oracle.jdbc.OracleDriver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:update}
+    properties:
+      hibernate:
+        format_sql: false
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+        delivery.timeout.ms: 10000
+        request.timeout.ms: 5000
+        max.block.ms: 3000
+        linger.ms: 5
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP:sms-student-events}
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      ack-mode: manual
+    admin:
+      fail-fast: false
+
+app:
+  jwt:
+    # Must be at least 32 characters; override in every real deployment.
+    secret: ${JWT_SECRET:change-me-change-me-change-me-change-me-0123456789}
+    access-expiry-minutes: ${JWT_ACCESS_EXPIRY_MINUTES:120}
+    refresh-expiry-days: ${JWT_REFRESH_EXPIRY_DAYS:7}
+  admin:
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD:admin123}
+  kafka:
+    topic: ${KAFKA_TOPIC:student-events}
+    partitions: ${KAFKA_TOPIC_PARTITIONS:3}
+    relay-interval-ms: ${OUTBOX_RELAY_INTERVAL_MS:1000}
+    relay-batch-size: ${OUTBOX_RELAY_BATCH_SIZE:50}
+    send-timeout-ms: ${OUTBOX_SEND_TIMEOUT_MS:10000}
+    max-consumer-attempts: ${KAFKA_CONSUMER_MAX_ATTEMPTS:3}
+
+management:
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health
+      path-mapping:
+        health: health
+  endpoint:
+    health:
+      show-details: never
+
+springdoc:
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /api-docs
+
+logging:
+  level:
+    com.school.sms: INFO
+  pattern:
+    level: "%5p [%X{correlationId:-}]"
